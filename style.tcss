@@ -1,7 +1,0 @@
-Screen {
-    align: center middle; 
-}
-
-Digits {
-    width: auto;
-}

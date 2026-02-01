@@ -2,8 +2,6 @@
 import ipod
 import navidrome
 
-from textual import log
-
 class Track:
     def __init__(self, title: str, artist: str, album: str, genre: str, year: int, track_number: int, size: int, navidrome_id: str, is_on_ipod: bool = False):
         self.title: str = title

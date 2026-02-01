@@ -1,0 +1,5 @@
+-e git+https://github.com/Dennisman219/libgpod-python.git#egg=libgpod-python
+textual
+textual-dev
+python-dotenv
+requests

@@ -21,6 +21,17 @@ class Track:
         self.explicit_flag_for_ipod: bool = False # user requested this song specifically to be on the iPod
         self.implicit_flag_for_ipod: bool = False # this song should be on the iPod because of other user requests (artist/album/playlist)
 
+    def create_ipod_track(self) -> ipod.gpod.Track:
+        ipod_track: ipod.gpod.Track = ipod.gpod.Track(
+            title=self.title,
+            artist=self.artist,
+            album=self.album,
+            genre=self.genre
+        )
+        ipod_track.year = self.year
+        ipod_track.track_number = self.track_number
+        return ipod_track
+
     def match_with_ipod_track(self, track: ipod.gpod.Track) -> bool:
         return self.title == track.title and self.artist == track.artist and self.album == track.album # and self.genre == track.genre and self.year == track.year and self.track_number == track.track_number
 
@@ -93,3 +104,22 @@ def find_tracks_to_sync() -> int:
         if track.explicit_flag_for_ipod or track.implicit_flag_for_ipod:
             total_size += track.size
     return total_size
+
+def synchronize() -> str:
+    tracks_to_add: list[Track] = [track for track in track_list if (track.implicit_flag_for_ipod or track.explicit_flag_for_ipod) and not track.is_on_ipod]
+    tracks_to_remove: list[ipod.gpod.Track] = [track.create_ipod_track() for track in track_list if not (track.implicit_flag_for_ipod or track.explicit_flag_for_ipod) and track.is_on_ipod]
+    tracks_to_remove.extend(unmatched_ipod_tracks)
+
+    print(tracks_to_add)
+    print(tracks_to_remove)
+
+    for track in tracks_to_add:
+        print(f"SYNCING {str(track)}")
+        ipod_track: ipod.gpod.Track = track.create_ipod_track()
+        navidrome.download_track(track.navidrome_id)
+        success: bool = ipod.db.copy_file_to_ipod(ipod_track, "track.m4a")
+        if success:
+            ipod.db.add(ipod_track)
+            ipod.db.save()
+    
+    print("SYNC DONE")

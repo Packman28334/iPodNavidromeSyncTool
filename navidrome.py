@@ -2,16 +2,25 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from textual import log
-
 import requests
+import pathlib
 
-def send_get_request(endpoint: str, params: dict = {}):
+def send_get_request(endpoint: str, params: dict = {}) -> dict:
     base_url: str = f"{os.environ['NAVIDROME_URL']}{endpoint}?u={os.environ['NAVIDROME_USERNAME']}&p={os.environ['NAVIDROME_PASSWORD']}&v=1.13.0&c=iPodSyncTool&f=json"
     r = requests.get(
         base_url+"&"+"&".join([key+"="+str(value) for key, value in params.items()]) if params else base_url
     )
     return r.json()
+
+def send_get_request_raw(endpoint: str, params: dict = {}) -> bytes:
+    base_url: str = f"{os.environ['NAVIDROME_URL']}{endpoint}?u={os.environ['NAVIDROME_USERNAME']}&p={os.environ['NAVIDROME_PASSWORD']}&v=1.13.0&c=iPodSyncTool&f=json"
+    r = requests.get(
+        base_url+"&"+"&".join([key+"="+str(value) for key, value in params.items()]) if params else base_url
+    )
+    return r.content
+
+def download_track(track_id: str):
+    pathlib.Path("track.m4a").write_bytes(send_get_request_raw("/rest/stream", {"id": track_id, "maxBitRate": 128, "format": "m4a"}))
 
 def get_tracks() -> list[dict]:
     tracks: list[dict] = []

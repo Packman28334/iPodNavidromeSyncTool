@@ -3,7 +3,7 @@ import track_manager
 
 from textual import log
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, TabbedContent, TabPane, ProgressBar, ContentSwitcher
+from textual.widgets import Header, Footer, TabbedContent, TabPane, ProgressBar, Input
 
 from media_pane import MediaPane
 
@@ -11,6 +11,8 @@ from media_pane import MediaPane
 
 class SyncApp(App):
     CSS_PATH = "style.tcss"
+
+    BINDINGS = [("ctrl+s", "synchronize", "synchronize iPod")]
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True, time_format="%-I:%M %p")
@@ -32,6 +34,9 @@ class SyncApp(App):
 
     def on_unmount(self) -> None:
         track_manager.save_previously_selected()
+
+    def action_synchronize(self) -> None:
+        track_manager.synchronize()
 
 if __name__ == "__main__":
     app = SyncApp()

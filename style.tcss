@@ -1,0 +1,8 @@
+SelectionList {
+    height: 1fr;
+}
+
+ProgressBar {
+    dock: bottom;
+    height: 2;
+}
